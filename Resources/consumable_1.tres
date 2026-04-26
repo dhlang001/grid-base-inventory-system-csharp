@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3 uid="uid://cfaqbggan1oc1"]
+
+[ext_resource type="Texture2D" uid="uid://tlkilfmuuy0q" path="res://Art/UI/test_item_icons/bottle.png" id="1_sexac"]
+[ext_resource type="Script" uid="uid://dfw5oyft01hda" path="res://Scripts/Model/Item/ConsumableData.cs" id="1_w53aj"]
+
+[resource]
+script = ExtResource("1_w53aj")
+StackSize = 5
+CurrentAmount = 3
+ItemName = "Healing Potion"
+Type = "POTION"
+Icon = ExtResource("1_sexac")
+Rows = 2

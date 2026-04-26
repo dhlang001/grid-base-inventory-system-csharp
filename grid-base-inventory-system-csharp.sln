@@ -1,0 +1,19 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grid-base-inventory-system-csharp", "grid-base-inventory-system-csharp.csproj", "{BFE37EFE-B793-47DC-9428-03884282810F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BFE37EFE-B793-47DC-9428-03884282810F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFE37EFE-B793-47DC-9428-03884282810F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFE37EFE-B793-47DC-9428-03884282810F}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{BFE37EFE-B793-47DC-9428-03884282810F}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{BFE37EFE-B793-47DC-9428-03884282810F}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{BFE37EFE-B793-47DC-9428-03884282810F}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+EndGlobal

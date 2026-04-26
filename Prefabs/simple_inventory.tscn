@@ -1,0 +1,221 @@
+[gd_scene format=3 uid="uid://dsog0gfwhvond"]
+
+[ext_resource type="Script" uid="uid://bkarglgkijmea" path="res://Scripts/Controller/SimpleInventoryController.cs" id="1_hx8vv"]
+[ext_resource type="Script" uid="uid://h0jscnkxg8nu" path="res://Scripts/Model/Item/ItemData.cs" id="2_sgum7"]
+[ext_resource type="Resource" uid="uid://cfaqbggan1oc1" path="res://Resources/consumable_1.tres" id="3_nkpi0"]
+[ext_resource type="Resource" uid="uid://ce4ddmxwi6jev" path="res://Resources/equipment_1.tres" id="4_d0q5i"]
+[ext_resource type="Resource" uid="uid://cq0t5tnyb46y7" path="res://Resources/stackable_1.tres" id="5_7li87"]
+[ext_resource type="Script" uid="uid://dsn6cmkein0tf" path="res://Scripts/View/Item/DropAreaView.cs" id="6_sgum7"]
+[ext_resource type="Script" uid="uid://clhhwim61qe0j" path="res://Scripts/View/Container/Inventory/InventoryView.cs" id="7_nkpi0"]
+[ext_resource type="PackedScene" uid="uid://br4311shes2x7" path="res://Prefabs/item_info.tscn" id="8_hx8vv"]
+
+[node name="SimpleInventory" type="Control" unique_id=279983540 node_paths=PackedStringArray("inventory", "storage")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hx8vv")
+Items = Array[ExtResource("2_sgum7")]([ExtResource("3_nkpi0"), ExtResource("4_d0q5i"), ExtResource("5_7li87")])
+inventory = NodePath("Inventory")
+storage = NodePath("Storage")
+
+[node name="DropAreaView" type="Control" parent="." unique_id=985002239]
+visible = false
+anchors_preset = 0
+offset_right = 1920.0
+offset_bottom = 1017.0
+script = ExtResource("6_sgum7")
+
+[node name="Inventory" type="ColorRect" parent="." unique_id=1740109347]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 97.0
+offset_right = 558.0
+offset_bottom = 555.0
+color = Color(0.17027, 0.17027, 0.17027, 1)
+
+[node name="InventoryView" type="Control" parent="Inventory" unique_id=1617360818]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -159.5
+offset_top = -393.0
+offset_right = 160.5
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("7_nkpi0")
+ContainerName = "demo1_inventory"
+ContainerColumns = 10
+ContainerRows = 12
+StackNumFontSize = 12
+StackNumMargin = 2
+StackNumColor = Color(0.856916, 0.880705, 0.757161, 1)
+
+[node name="InventoryView2" type="Control" parent="Inventory" unique_id=1427355653]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -296.0
+offset_top = -146.0
+offset_right = -176.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("7_nkpi0")
+ContainerName = "demo1_inventory"
+ContainerColumns = 10
+ContainerRows = 12
+BaseSize = 12
+StackNumFontSize = 4
+StackNumMargin = 1
+
+[node name="Label" type="Label" parent="Inventory" unique_id=17056154]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -83.0
+offset_right = 83.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Inventory"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ButtonCloseInventory" type="Button" parent="Inventory" unique_id=713592612]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -69.0
+offset_top = 9.0
+offset_right = -10.0
+offset_bottom = 54.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "X"
+
+[node name="Storage" type="ColorRect" parent="." unique_id=1372017544]
+layout_mode = 0
+offset_left = 568.0
+offset_top = 97.0
+offset_right = 1096.0
+offset_bottom = 555.0
+color = Color(0.17027, 0.17027, 0.17027, 1)
+
+[node name="InventoryView" type="Control" parent="Storage" unique_id=409439288]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -256.0
+offset_top = -392.0
+offset_right = 256.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("7_nkpi0")
+ContainerName = "demo1_storage"
+ContainerColumns = 16
+ContainerRows = 12
+GridBorderColor = Color(0.741829, 0.728659, 0.855877, 1)
+GirdBackgroundColorEmpty = Color(0.251759, 0.44292, 0.364007, 1)
+StackNumFontSize = 12
+StackNumMargin = 2
+StackNumColor = Color(0.856916, 0.880705, 0.757161, 1)
+
+[node name="Label" type="Label" parent="Storage" unique_id=1562170832]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -112.0
+offset_top = 3.0
+offset_right = 112.0
+offset_bottom = 55.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "Storage"
+horizontal_alignment = 1
+
+[node name="ButtonCloseStorage" type="Button" parent="Storage" unique_id=1074718034]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -67.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 55.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "X"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1427995379]
+layout_mode = 1
+offset_left = 38.0
+offset_top = 97.0
+offset_right = 176.0
+offset_bottom = 268.0
+
+[node name="ButtonToggleInventory" type="Button" parent="VBoxContainer" unique_id=1520363250]
+layout_mode = 2
+text = "Toggle Inventory"
+
+[node name="ButtonToggleStorage" type="Button" parent="VBoxContainer" unique_id=839848871]
+layout_mode = 2
+text = "Toggle Storage"
+
+[node name="ButtonAddTestItems" type="Button" parent="VBoxContainer" unique_id=299895607]
+layout_mode = 2
+text = "Add Test Items"
+
+[node name="ButtonSave" type="Button" parent="VBoxContainer" unique_id=1910101751]
+layout_mode = 2
+text = "Save Game"
+
+[node name="ButtonLoad" type="Button" parent="VBoxContainer" unique_id=833694265]
+layout_mode = 2
+text = "Load Game"
+
+[node name="Label" type="Label" parent="." unique_id=991261436]
+layout_mode = 0
+offset_left = 92.0
+offset_top = 562.0
+offset_right = 638.0
+offset_bottom = 611.0
+text = "The small inventory and big inventory share the same name,
+so they mirror each other."
+
+[node name="Label2" type="Label" parent="." unique_id=1656377250]
+layout_mode = 0
+offset_left = 356.0
+offset_top = 12.0
+offset_right = 918.0
+offset_bottom = 61.0
+text = "Shift + right click to quick move item
+Middle mouse button to split stackable items
+Right mouse button to use consumable items"
+
+[node name="ItemInfo" parent="." unique_id=613081412 instance=ExtResource("8_hx8vv")]
+layout_mode = 0
+
+[connection signal="pressed" from="Inventory/ButtonCloseInventory" to="." method="_on_button_close_inventory_pressed"]
+[connection signal="pressed" from="Storage/ButtonCloseStorage" to="." method="_on_button_close_storage_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonToggleInventory" to="." method="_on_button_toggle_inventory_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonToggleStorage" to="." method="_on_button_toggle_storage_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonAddTestItems" to="." method="_on_button_add_test_items_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonSave" to="." method="_on_button_save_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonLoad" to="." method="_on_button_load_pressed"]

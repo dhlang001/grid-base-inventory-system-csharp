@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://br4311shes2x7"]
+
+[ext_resource type="Script" uid="uid://bofklgbppvism" path="res://Scripts/Controller/ItemInfoController.cs" id="1_bkodp"]
+
+[node name="ItemInfo" type="ColorRect" unique_id=1498172792 node_paths=PackedStringArray("item_name_label")]
+custom_minimum_size = Vector2(100, 30)
+offset_right = 138.0
+offset_bottom = 71.0
+color = Color(0.0862745, 0.0862745, 0.0862745, 0.745098)
+script = ExtResource("1_bkodp")
+item_name_label = NodePath("ItemNameLabel")
+
+[node name="ItemNameLabel" type="Label" parent="." unique_id=466480879]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Item Name"
+horizontal_alignment = 1
+vertical_alignment = 1

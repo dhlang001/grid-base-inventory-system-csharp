@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cld1mi0t1l8q7"]
+
+[ext_resource type="PackedScene" uid="uid://dsog0gfwhvond" path="res://Prefabs/simple_inventory.tscn" id="1_b0ru2"]
+[ext_resource type="Texture2D" uid="uid://81m0vo3lhp0g" path="res://icon.svg" id="2_kocm7"]
+
+[node name="CSharpTest" type="Node" unique_id=180174020]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=136566788]
+
+[node name="SimpleInventory" parent="CanvasLayer" unique_id=279983540 instance=ExtResource("1_b0ru2")]
+
+[node name="Node2D" type="Node2D" parent="." unique_id=1469409065]
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D" unique_id=1395585442]
+position = Vector2(-425, -220)
+texture = ExtResource("2_kocm7")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=115844334]
