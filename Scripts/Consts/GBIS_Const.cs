@@ -1,6 +1,8 @@
 using Godot;
 using System;
 
+namespace GridBaseInventorySystem;
+
 /// <summary>
 /// 网格背包系统常量
 /// </summary>
