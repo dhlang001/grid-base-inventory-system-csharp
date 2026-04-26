@@ -17,7 +17,7 @@ public partial class ItemInfoController : ColorRect, IController
 	{
 		base._Ready();
 		this.Hide();
-		GBIS_CSharp.Instance.SigItemFocused += SigItemFocused;
+		this.RegisterEvent<SigItemFocusedEvent>(SigItemFocused).UnRegisterWhenNodeExitTree(this);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -26,21 +26,21 @@ public partial class ItemInfoController : ColorRect, IController
 		Position = this.GetGlobalMousePosition() + (Vector2.One * 5);
 	}
 
-	private void SigItemFocused(ItemData item_data, string containerName)
+	private void SigItemFocused(SigItemFocusedEvent e)
 	{
 		this.Show();
-		if (GBIS_CSharp.Instance.ShopNames.IndexOf(containerName) != -1)
+		if (this.GetModel<GBIS_Model>().ShopNames.IndexOf(e.containerName) != -1)
 		{
-			item_name_label.Text = $"[Shop] {item_data.ItemName}";
+			item_name_label.Text = $"[Shop] {e.itemData.ItemName}";
 		}
 		else
 		{
-			item_name_label.Text = item_data.ItemName;
+			item_name_label.Text = e.itemData.ItemName;
 		}
-		GBIS_CSharp.Instance.SigItemFocusLost += SigItemFocusLost;
+		this.RegisterEvent<SigItemFocusLostEvent>(SigItemFocusLost).UnRegisterWhenNodeExitTree(this);
 	}
 
-	private void SigItemFocusLost(ItemData itemData)
+	private void SigItemFocusLost(SigItemFocusLostEvent e)
 	{
 		this.Hide();
 	}

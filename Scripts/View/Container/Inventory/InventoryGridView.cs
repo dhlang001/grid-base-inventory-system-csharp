@@ -1,4 +1,5 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -18,26 +19,26 @@ public partial class InventoryGridView : BaseGridView
 		if (!@event.IsPressed())
 			return;
 
-		GBIS_CSharp.Instance.ItemFocusService.ItemLoseFocus();
+		this.GetSystem<ItemFocusService>().ItemLoseFocus();
 
 		// 处理点击动作
-		if (@event.IsActionPressed(GBIS_CSharp.Instance.InputClick))
+		if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputClick))
 		{
 			if (HasTaken)
 			{
-				if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+				if (this.GetSystem<MovingItemService>().MovingItem == null)
 				{
-					GBIS_CSharp.Instance.MovingItemService.MoveItemByGrid(_containerView.ContainerName, GridId, Offset, _size);
+					this.GetSystem<MovingItemService>().MoveItemByGrid(_containerView.ContainerName, GridId, Offset, _size);
 				}
-				else if (GBIS_CSharp.Instance.MovingItemService.MovingItem is StackableData)
+				else if (this.GetSystem<MovingItemService>().MovingItem is StackableData)
 				{
-					GBIS_CSharp.Instance.InventoryService.StackMovingItem(_containerView.ContainerName, GridId);
+					this.GetSystem<InventoryService>().StackMovingItem(_containerView.ContainerName, GridId);
 				}
 				_containerView.GridHover(GridId);
 			}
 			else
 			{
-				GBIS_CSharp.Instance.InventoryService.PlaceMovingItem(_containerView.ContainerName, GridId);
+				this.GetSystem<InventoryService>().PlaceMovingItem(_containerView.ContainerName, GridId);
 			}
 			return;
 		}
@@ -46,17 +47,17 @@ public partial class InventoryGridView : BaseGridView
 		if (!HasTaken)
 			return;
 
-		if (@event.IsActionPressed(GBIS_CSharp.Instance.InputQuickMove))
+		if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputQuickMove))
 		{
-			GBIS_CSharp.Instance.InventoryService.QuickMove(_containerView.ContainerName, GridId);
+			this.GetSystem<InventoryService>().QuickMove(_containerView.ContainerName, GridId);
 		}
-		else if (@event.IsActionPressed(GBIS_CSharp.Instance.InputUse))
+		else if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputUse))
 		{
-			GBIS_CSharp.Instance.InventoryService.UseItem(_containerView.ContainerName, GridId);
+			this.GetSystem<InventoryService>().UseItem(_containerView.ContainerName, GridId);
 		}
-		else if (@event.IsActionPressed(GBIS_CSharp.Instance.InputSplit) && GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+		else if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputSplit) && this.GetSystem<MovingItemService>().MovingItem == null)
 		{
-			GBIS_CSharp.Instance.InventoryService.SplitItem(_containerView.ContainerName, GridId, Offset, _size);
+			this.GetSystem<InventoryService>().SplitItem(_containerView.ContainerName, GridId, Offset, _size);
 		}
 	}
 }

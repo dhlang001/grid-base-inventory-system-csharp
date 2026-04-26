@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -26,15 +27,15 @@ public partial class InventoryView : BaseContainerView
 
 	private void HandleGridHover(Vector2I gridId, bool isHover)
 	{
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+		if (this.GetSystem<MovingItemService>().MovingItem == null)
 		{
-			var data = GBIS_CSharp.Instance.InventoryService.FindItemDataByGrid(this.ContainerName, gridId);
+			var data = this.GetSystem<InventoryService>().FindItemDataByGrid(this.ContainerName, gridId);
 			if (data != null)
 			{
 				if (isHover)
-					GBIS_CSharp.Instance.ItemFocusService.FocusItem(data, this.ContainerName);
+					this.GetSystem<ItemFocusService>().FocusItem(data, this.ContainerName);
 				else
-					GBIS_CSharp.Instance.ItemFocusService.ItemLoseFocus();
+					this.GetSystem<ItemFocusService>().ItemLoseFocus();
 			}
 			return;
 		}
@@ -42,7 +43,7 @@ public partial class InventoryView : BaseContainerView
 		// 下面是对正在移动的物体的处理
 		if (isHover)
 		{
-			var movingItemView = GBIS_CSharp.Instance.MovingItemService.MovingItemView;
+			var movingItemView = this.GetSystem<MovingItemService>().MovingItemView;
 			movingItemView.BaseSize = BaseSize;
 			movingItemView.StackNumColor = StackNumColor;
 			movingItemView.StackNumFont = StackNumFont;
@@ -50,26 +51,26 @@ public partial class InventoryView : BaseContainerView
 			movingItemView.StackNumMargin = StackNumMargin;
 		}
 
-		var movingItemOffset = GBIS_CSharp.Instance.MovingItemService.MovingItemOffset;
-		var movingItem = GBIS_CSharp.Instance.MovingItemService.MovingItem;
+		var movingItemOffset = this.GetSystem<MovingItemService>().MovingItemOffset;
+		var movingItem = this.GetSystem<MovingItemService>().MovingItem;
 		var itemShape = movingItem.GetShape();
 		var grids = GetGridsByShape(gridId - movingItemOffset, itemShape);
 
 		bool hasConflict = false;
 		if (isHover)
 		{
-			hasConflict = itemShape.X * itemShape.Y != grids.Count || !GBIS_CSharp.Instance.InventoryService.GetContainer(ContainerName).IsItemAvilable(movingItem);
+			hasConflict = itemShape.X * itemShape.Y != grids.Count || !this.GetSystem<InventoryService>().GetContainer(ContainerName).IsItemAvilable(movingItem);
 			foreach (var grid in grids)
 			{
 				if (hasConflict)
 					break;
 				hasConflict = this._gridMap[grid].HasTaken;
-				var itemData = GBIS_CSharp.Instance.InventoryService.FindItemDataByGrid(this.ContainerName, gridId);
+				var itemData = this.GetSystem<InventoryService>().FindItemDataByGrid(this.ContainerName, gridId);
 				if (hasConflict && itemData != null)
 				{
 					if (itemData is StackableData stackable)
 					{
-						if (itemData.ItemName == GBIS_CSharp.Instance.MovingItemService.MovingItem.ItemName && !stackable.IsFull())
+						if (itemData.ItemName == this.GetSystem<MovingItemService>().MovingItem.ItemName && !stackable.IsFull())
 						{
 							hasConflict = false;
 						}
@@ -83,11 +84,11 @@ public partial class InventoryView : BaseContainerView
 			var gridView = this._gridMap[grid];
 			if (isHover)
 			{
-				gridView.State = hasConflict ? BaseGridView.GridState.Conflict : BaseGridView.GridState.Avilable;
+				gridView.State = hasConflict ? GridState.Conflict : GridState.Avilable;
 			}
 			else
 			{
-				gridView.State = gridView.HasTaken ? BaseGridView.GridState.Taken : BaseGridView.GridState.Empty;
+				gridView.State = gridView.HasTaken ? GridState.Taken : GridState.Empty;
 			}
 		}
 	}
@@ -98,7 +99,7 @@ public partial class InventoryView : BaseContainerView
 		{
 			child.QueueFree();
 		}
-		var ret = GBIS_CSharp.Instance.InventoryService.Regist(newContainerName, this.ContainerColumns, this.ContainerRows, false, this.AvilableTypes);
+		var ret = this.GetSystem<InventoryService>().Regist(newContainerName, this.ContainerColumns, this.ContainerRows, false, this.AvilableTypes);
 		this.ContainerName = newContainerName;
 		this.AvilableTypes = ret.AvilableTypes;
 		this.ContainerColumns = ret.Columns;
@@ -123,13 +124,13 @@ public partial class InventoryView : BaseContainerView
 			return;
 		}
 
-		var ret = GBIS_CSharp.Instance.InventoryService.Regist(this.ContainerName, this.ContainerColumns, this.ContainerRows, false, this.AvilableTypes);
+		var ret = this.GetSystem<InventoryService>().Regist(this.ContainerName, this.ContainerColumns, this.ContainerRows, false, this.AvilableTypes);
 
 		if (this.Visible)
-			GBIS_CSharp.Instance.OpenedContainers.Add(this.ContainerName);
+			this.GetModel<GBIS_Model>().OpenedContainers.Add(this.ContainerName);
 
-		if (!GBIS_CSharp.Instance.InventoryNames.Contains(this.ContainerName))
-			GBIS_CSharp.Instance.InventoryNames.Add(this.ContainerName);
+		if (!this.GetModel<GBIS_Model>().InventoryNames.Contains(this.ContainerName))
+			this.GetModel<GBIS_Model>().InventoryNames.Add(this.ContainerName);
 
 		// 使用已注册的信息覆盖View设置
 		this.AvilableTypes = ret.AvilableTypes;
@@ -140,10 +141,10 @@ public partial class InventoryView : BaseContainerView
 		this.InitGridContainer();
 		this.InitItemContainer();
 		this.InitGrids();
-		GBIS_CSharp.Instance.SigInvItemAdded += OnItemAdded;
-		GBIS_CSharp.Instance.SigInvItemRemoved += OnItemRemoved;
-		GBIS_CSharp.Instance.SigInvItemUpdated += OnInvItemUpdated;
-		GBIS_CSharp.Instance.SigInvRefresh += Refresh;
+		this.RegisterEvent<SigInvItemAddedEvent>(e => OnItemAdded(e.invName, e.itemData, e.grids)).UnRegisterWhenNodeExitTree(this);
+		this.RegisterEvent<SigInvItemRemovedEvent>(e => OnItemRemoved(e.invName, e.itemData)).UnRegisterWhenNodeExitTree(this);
+		this.RegisterEvent<SigInvItemUpdatedEvent>(e => OnInvItemUpdated(e.invName, e.gridId)).UnRegisterWhenNodeExitTree(this);
+		this.RegisterEvent<SigInvRefreshEvent>(e => Refresh()).UnRegisterWhenNodeExitTree(this);
 
 		this.VisibilityChanged += OnVisibleChanged;
 

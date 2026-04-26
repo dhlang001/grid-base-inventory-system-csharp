@@ -1,17 +1,23 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 装备槽业务类
 /// </summary>
-public partial class EquipmentSlotService : Node
+public partial class EquipmentSlotService : AbstractSystem
 {
 	/// <summary>
 	/// 装备槽数据库引用
 	/// </summary>
 	protected EquipmentSlotRepository _equipmentSlotRepository = EquipmentSlotRepository.Instance;
+
+	protected override void OnInit()
+	{
+
+	}
 
 	/// <summary>
 	/// 保存所有装备槽数据
@@ -81,7 +87,7 @@ public partial class EquipmentSlotService : Node
 		var slot = _equipmentSlotRepository.TryEquip(itemData);
 		if (slot != null)
 		{
-			GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigSlotItemEquipped, slot.SlotName, itemData);
+			this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slot.SlotName, itemData = itemData });
 			return true;
 		}
 		return false;
@@ -94,9 +100,9 @@ public partial class EquipmentSlotService : Node
 	/// <returns></returns>
 	public bool EquipMovingItem(string slotName)
 	{
-		if (EquipTo(slotName, GBIS_CSharp.Instance.MovingItemService.MovingItem))
+		if (EquipTo(slotName, this.GetSystem<MovingItemService>().MovingItem))
 		{
-			GBIS_CSharp.Instance.MovingItemService.ClearMovingItem();
+			this.GetSystem<MovingItemService>().ClearMovingItem();
 			return true;
 		}
 		return false;
@@ -112,7 +118,7 @@ public partial class EquipmentSlotService : Node
 	{
 		if (_equipmentSlotRepository.GetSlot(slotName).Equip(itemData))
 		{
-			GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigSlotItemEquipped, slotName, itemData);
+			this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
 			return true;
 		}
 		return false;
@@ -125,18 +131,18 @@ public partial class EquipmentSlotService : Node
 	/// <returns></returns>
 	public ItemData Unequip(string slotName)
 	{
-		var openedContainers = new Array<string>(GBIS_CSharp.Instance.OpenedContainers);
+		var openedContainers = new Array<string>(this.GetModel<GBIS_Model>().OpenedContainers);
 		// reverse iteration
 		for (int i = openedContainers.Count - 1; i >= 0; i--)
 		{
 			var currentInventory = openedContainers[i];
-			if (!GBIS_CSharp.Instance.InventoryNames.Contains(currentInventory))
+			if (!this.GetModel<GBIS_Model>().InventoryNames.Contains(currentInventory))
 				continue;
 			var itemData = GetSlot(slotName).EquippedItem;
-			if (itemData != null && GBIS_CSharp.Instance.InventoryService.AddItem(currentInventory, itemData))
+			if (itemData != null && this.GetSystem<InventoryService>().AddItem(currentInventory, itemData))
 			{
 				_equipmentSlotRepository.GetSlot(slotName).Unequip();
-				GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigSlotItemUnequipped, slotName, itemData);
+				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
 				return itemData;
 			}
 		}
@@ -150,7 +156,7 @@ public partial class EquipmentSlotService : Node
 	/// <param name="baseSize"></param>
 	public void MoveItem(string slotName, int baseSize)
 	{
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem != null)
+		if (this.GetSystem<MovingItemService>().MovingItem != null)
 		{
 			GD.PushError("Already had moving item.");
 			return;
@@ -160,8 +166,8 @@ public partial class EquipmentSlotService : Node
 		{
 			if (_equipmentSlotRepository.GetSlot(slotName).Unequip() != null)
 			{
-				GBIS_CSharp.Instance.MovingItemService.MoveItemByData(itemData, Vector2I.Zero, baseSize);
-				GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigSlotItemUnequipped, slotName, itemData);
+				this.GetSystem<MovingItemService>().MoveItemByData(itemData, Vector2I.Zero, baseSize);
+				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
 			}
 		}
 	}

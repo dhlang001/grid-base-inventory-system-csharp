@@ -1,24 +1,27 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 背包视图，控制背包的绘制
 /// </summary>
-public partial class BaseContainerView : Control
+public partial class BaseContainerView : Control, IController
 {
+
+	[ExportGroup("Container Settings")]
 	/// <summary>
 	/// 背包名字，如果重复，则显示同一来源的数据
 	/// </summary>
-	[ExportGroup("Container Settings")]
-	[Export] public string ContainerName { get; set; } = GBIS_CSharp.DefaultInventoryName;
+	[Export] public string ContainerName { get; set; } = GBIS_Const.DefaultInventoryName;
 
 	private int _containerColumns = 2;
 	/// <summary>
 	/// 背包列数，如果背包名字重复，列数需要一样
 	/// </summary>
-	[Export] public int ContainerColumns
+	[Export]
+	public int ContainerColumns
 	{
 		get => _containerColumns;
 		set { _containerColumns = value; RecalculateSize(); }
@@ -28,7 +31,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 背包行数，如果背包名字重复，行数需要一样
 	/// </summary>
-	[Export] public int ContainerRows
+	[Export]
+	public int ContainerRows
 	{
 		get => _containerRows;
 		set { _containerRows = value; RecalculateSize(); }
@@ -39,7 +43,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子大小
 	/// </summary>
-	[Export] public int BaseSize
+	[Export]
+	public int BaseSize
 	{
 		get => _baseSize;
 		set { _baseSize = value; RecalculateSize(); }
@@ -49,7 +54,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子边框大小
 	/// </summary>
-	[Export] public int GridBorderSize
+	[Export]
+	public int GridBorderSize
 	{
 		get => _gridBorderSize;
 		set { _gridBorderSize = value; QueueRedraw(); }
@@ -59,7 +65,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子边框颜色
 	/// </summary>
-	[Export] public Color GridBorderColor
+	[Export]
+	public Color GridBorderColor
 	{
 		get => _gridBorderColor;
 		set { _gridBorderColor = value; QueueRedraw(); }
@@ -69,7 +76,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子空置颜色
 	/// </summary>
-	[Export] public Color GirdBackgroundColorEmpty
+	[Export]
+	public Color GirdBackgroundColorEmpty
 	{
 		get => _girdBackgroundColorEmpty;
 		set { _girdBackgroundColorEmpty = value; QueueRedraw(); }
@@ -79,7 +87,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子占用颜色
 	/// </summary>
-	[Export] public Color GirdBackgroundColorTaken
+	[Export]
+	public Color GirdBackgroundColorTaken
 	{
 		get => _girdBackgroundColorTaken;
 		set { _girdBackgroundColorTaken = value; QueueRedraw(); }
@@ -89,7 +98,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子冲突颜色
 	/// </summary>
-	[Export] public Color GirdBackgroundColorConflict
+	[Export]
+	public Color GirdBackgroundColorConflict
 	{
 		get => _girdBackgroundColorConflict;
 		set { _girdBackgroundColorConflict = value; QueueRedraw(); }
@@ -99,7 +109,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 格子可用颜色
 	/// </summary>
-	[Export] public Color GridBackgroundColorAvilable
+	[Export]
+	public Color GridBackgroundColorAvilable
 	{
 		get => _gridBackgroundColorAvilable;
 		set { _gridBackgroundColorAvilable = value; QueueRedraw(); }
@@ -110,7 +121,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 堆叠数量的字体
 	/// </summary>
-	[Export] public Font StackNumFont
+	[Export]
+	public Font StackNumFont
 	{
 		get => _stackNumFont;
 		set { _stackNumFont = value; QueueRedraw(); }
@@ -120,7 +132,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 堆叠数量的字体大小
 	/// </summary>
-	[Export] public int StackNumFontSize
+	[Export]
+	public int StackNumFontSize
 	{
 		get => _stackNumFontSize;
 		set { _stackNumFontSize = value; QueueRedraw(); }
@@ -130,7 +143,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 堆叠数量的边距（右下角）
 	/// </summary>
-	[Export] public int StackNumMargin
+	[Export]
+	public int StackNumMargin
 	{
 		get => _stackNumMargin;
 		set { _stackNumMargin = value; QueueRedraw(); }
@@ -140,7 +154,8 @@ public partial class BaseContainerView : Control
 	/// <summary>
 	/// 堆叠数量的颜色
 	/// </summary>
-	[Export] public Color StackNumColor
+	[Export]
+	public Color StackNumColor
 	{
 		get => _stackNumColor;
 		set { _stackNumColor = value; QueueRedraw(); }
@@ -172,15 +187,20 @@ public partial class BaseContainerView : Control
 	/// </summary>
 	protected Godot.Collections.Dictionary<Vector2I, ItemView> _gridItemMap = new();
 
+	public IArchitecture GetArchitecture()
+	{
+		return GameArchitecture.Interface;
+	}
+
 	/// <summary>
 	/// 刷新背包显示
 	/// </summary>
 	public virtual void Refresh()
 	{
 		ClearInv();
-		ContainerData containerData = GBIS_CSharp.Instance.InventoryService.GetContainer(ContainerName);
+		ContainerData containerData = this.GetSystem<InventoryService>().GetContainer(ContainerName);
 		if (containerData == null)
-			containerData = GBIS_CSharp.Instance.ShopService.GetContainer(ContainerName);
+			containerData = this.GetSystem<ShopService>().GetContainer(ContainerName);
 
 		var handledItem = new Godot.Collections.Dictionary<ItemData, ItemView>();
 		foreach (var grid in _gridMap.Keys)
@@ -230,14 +250,14 @@ public partial class BaseContainerView : Control
 	{
 		if (IsVisibleInTree())
 		{
-			GBIS_CSharp.Instance.OpenedContainers.Add(ContainerName);
+			this.GetModel<GBIS_Model>().OpenedContainers.Add(ContainerName);
 			// 需要等待GirdContainer处理完成，否则其下的所有grid没有position信息
 			await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 			CallDeferred(MethodName.Refresh);
 		}
 		else
 		{
-			GBIS_CSharp.Instance.OpenedContainers.Remove(ContainerName);
+			this.GetModel<GBIS_Model>().OpenedContainers.Remove(ContainerName);
 		}
 	}
 

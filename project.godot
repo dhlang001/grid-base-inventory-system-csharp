@@ -11,12 +11,13 @@ config_version=5
 [application]
 
 config/name="grid-base-inventory-system-csharp"
+run/main_scene="uid://cld1mi0t1l8q7"
 config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GbisCSharp="*uid://de84i31vqkr4"
+GbisController="*uid://dqtb51pvr3lr2"
 
 [dotnet]
 

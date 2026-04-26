@@ -1,11 +1,12 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 物品视图，控制物品的绘制
 /// </summary>
-public partial class ItemView : Control
+public partial class ItemView : Control, IController
 {
 
 	/// <summary>
@@ -65,11 +66,16 @@ public partial class ItemView : Control
 		{
 			Material = (ShaderMaterial)data.Material.Duplicate();
 		}
-		else if (GBIS_CSharp.Instance.ItemMaterial != null)
+		else if (this.GetModel<GBIS_Model>().ItemMaterial != null)
 		{
-			Material = (ShaderMaterial)GBIS_CSharp.Instance.ItemMaterial.Duplicate();
+			Material = (ShaderMaterial)this.GetModel<GBIS_Model>().ItemMaterial.Duplicate();
 		}
 		data.SigRefresh += QueueRedraw;
+	}
+
+	public IArchitecture GetArchitecture()
+	{
+		return GameArchitecture.Interface;
 	}
 
 	/// <summary>

@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -39,7 +40,7 @@ public partial class ShopService : BaseContainerService
 		if (item.CanSell())
 		{
 			item.Sold();
-			GBIS_CSharp.Instance.MovingItemService.ClearMovingItem();
+			this.GetSystem<MovingItemService>().ClearMovingItem();
 			return true;
 		}
 		return false;
@@ -52,7 +53,7 @@ public partial class ShopService : BaseContainerService
 	/// <returns></returns>
 	public ContainerData GetContainer(string containerName)
 	{
-		if (GBIS_CSharp.Instance.ShopNames.Contains(containerName))
+		if (this.GetModel<GBIS_Model>().ShopNames.Contains(containerName))
 			return _containerRepository.GetContainer(containerName);
 		return null;
 	}

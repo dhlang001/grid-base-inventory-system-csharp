@@ -1,4 +1,5 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -6,13 +7,19 @@ namespace GridBaseInventorySystem;
 /// 丢弃物品视图，加到场景中即可，会自动全屏并移到最底层
 /// </summary>
 [Tool]
-public partial class DropAreaView : Control
+public partial class DropAreaView : Control, IController
 {
+
+	public IArchitecture GetArchitecture()
+	{
+		return GameArchitecture.Interface;
+	}
+
 	public override void _Ready()
 	{
 		if (!Engine.IsEditorHint())
 		{
-			GBIS_CSharp.Instance.MovingItemService.DropAreaView = this;
+			this.GetSystem<MovingItemService>().DropAreaView = this;
 		}
 		MouseFilter = Control.MouseFilterEnum.Stop;
 		CallDeferred(MethodName.Resize);
@@ -33,12 +40,12 @@ public partial class DropAreaView : Control
 
 	public override void _GuiInput(InputEvent @event)
 	{
-		if (@event.IsActionPressed(GBIS_CSharp.Instance.InputClick))
+		if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputClick))
 		{
-			if (GBIS_CSharp.Instance.HasMovingItem() && GBIS_CSharp.Instance.MovingItemService.MovingItem.CanDrop())
+			if (this.GetSystem<GBIS_System>().HasMovingItem() && this.GetSystem<MovingItemService>().MovingItem.CanDrop())
 			{
-				GBIS_CSharp.Instance.MovingItemService.MovingItem.Drop();
-				GBIS_CSharp.Instance.MovingItemService.ClearMovingItem();
+				this.GetSystem<MovingItemService>().MovingItem.Drop();
+				this.GetSystem<MovingItemService>().ClearMovingItem();
 			}
 		}
 	}

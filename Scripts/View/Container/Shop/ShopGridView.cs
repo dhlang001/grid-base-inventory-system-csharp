@@ -1,4 +1,5 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -14,19 +15,19 @@ public partial class ShopGridView : BaseGridView
 
 	public override void _GuiInput(InputEvent @event)
 	{
-		if (@event.IsActionPressed(GBIS_CSharp.Instance.InputClick))
+		if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputClick))
 		{
 			if (HasTaken)
 			{
-				if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+				if (this.GetSystem<MovingItemService>().MovingItem == null)
 				{
-					var item = GBIS_CSharp.Instance.ShopService.FindItemDataByGrid(_containerView.ContainerName, GridId);
-					GBIS_CSharp.Instance.ShopService.Buy(_containerView.ContainerName, item);
+					var item = this.GetSystem<ShopService>().FindItemDataByGrid(_containerView.ContainerName, GridId);
+					this.GetSystem<ShopService>().Buy(_containerView.ContainerName, item);
 				}
 			}
-			else if (GBIS_CSharp.Instance.HasMovingItem())
+			else if (this.GetSystem<GBIS_System>().HasMovingItem())
 			{
-				GBIS_CSharp.Instance.ShopService.Sell(GBIS_CSharp.Instance.MovingItemService.MovingItem);
+				this.GetSystem<ShopService>().Sell(this.GetSystem<MovingItemService>().MovingItem);
 			}
 		}
 	}

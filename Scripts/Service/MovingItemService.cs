@@ -1,12 +1,13 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 移动物品业务类
 /// </summary>
-public partial class MovingItemService : Node
+public partial class MovingItemService : AbstractSystem
 {
 	/// <summary>
 	/// 正在移动的物品
@@ -28,7 +29,12 @@ public partial class MovingItemService : Node
 	/// <summary>
 	/// 顶层，用于展示移动物品的View
 	/// </summary>
-	public CanvasLayer _movingItemLayer { get; set; }
+	private CanvasLayer _movingItemLayer { get; set; }
+
+	protected override void OnInit()
+	{
+
+	}
 
 	/// <summary>
 	/// 获取顶层，没有则新建
@@ -40,7 +46,7 @@ public partial class MovingItemService : Node
 		{
 			_movingItemLayer = new CanvasLayer();
 			_movingItemLayer.Layer = 128;
-			GBIS_CSharp.Instance.GetRoot().AddChild(_movingItemLayer);
+			this.GetSystem<GBIS_System>().GetRoot().AddChild(_movingItemLayer);
 		}
 		return _movingItemLayer;
 	}
@@ -97,11 +103,11 @@ public partial class MovingItemService : Node
 			GD.PushError("Already had moving item.");
 			return;
 		}
-		var itemData = GBIS_CSharp.Instance.InventoryService.FindItemDataByGrid(invName, gridId);
+		var itemData = this.GetSystem<InventoryService>().FindItemDataByGrid(invName, gridId);
 		if (itemData != null)
 		{
 			MoveItemByData(itemData, offset, baseSize);
-			GBIS_CSharp.Instance.InventoryService.RemoveItemByData(invName, itemData);
+			this.GetSystem<InventoryService>().RemoveItemByData(invName, itemData);
 			if (DropAreaView != null)
 			{
 				DropAreaView.Show();

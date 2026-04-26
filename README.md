@@ -14,12 +14,10 @@ Used QFramework
 
 ![Inventory System Example](Plugins/GBIS/screenshots/Snipaste_2025-07-06_16-32-34.png)  
 
-![Inventory System Example](Plugins/GBIS/screenshots/Snipaste_2025-07-06_16-33-31.png)  
-
-![Inventory System Example](Plugins/GBIS//screenshots/Snipaste_2025-07-06_16-33-52.png)  
-
 ## 🙏 Original Author
 - [bilibili: Java已死游戏当立](https://space.bilibili.com/3546831153793300)
+
+---
 
 # 🎮 网格基础物品系统
 grid-base-inventory-system的C#版本

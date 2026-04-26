@@ -1,17 +1,23 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 物品焦点业务类
 /// </summary>
-public partial class ItemFocusService : Node
+public partial class ItemFocusService : AbstractSystem
 {
 	/// <summary>
 	/// 当前焦点目标
 	/// </summary>
-	public ItemData CurrentItemData { get; set; }
-	public string CurrentContainerName { get; set; } = "";
+	private ItemData CurrentItemData { get; set; }
+	private string CurrentContainerName { get; set; } = "";
+
+	protected override void OnInit()
+	{
+
+	}
 
 	/// <summary>
 	/// 焦点物品
@@ -21,7 +27,7 @@ public partial class ItemFocusService : Node
 	public void FocusItem(ItemData itemData, string containerName)
 	{
 		// 如果当前有移动物品，则不允许焦点切换
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem != null)
+		if (this.GetSystem<MovingItemService>().MovingItem != null)
 			return;
 
 		// 如果焦点没有变化，直接返回
@@ -31,7 +37,7 @@ public partial class ItemFocusService : Node
 		// 设置新焦点
 		CurrentItemData = itemData;
 		CurrentContainerName = containerName;
-		GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigItemFocused, itemData, CurrentContainerName);
+		this.SendEvent<SigItemFocusedEvent>(new SigItemFocusedEvent() { itemData = itemData, containerName = CurrentContainerName });
 	}
 
 	/// <summary>
@@ -41,7 +47,7 @@ public partial class ItemFocusService : Node
 	{
 		if (CurrentItemData == null)
 			return;
-		GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigItemFocusLost, (ItemData)CurrentItemData.Duplicate());
+		this.SendEvent<SigItemFocusLostEvent>(new SigItemFocusLostEvent() { itemData = (ItemData)CurrentItemData.Duplicate() });
 		CurrentItemData = null;
 		CurrentContainerName = "";
 	}

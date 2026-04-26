@@ -8,12 +8,12 @@ namespace GridBaseInventorySystem;
 /// <summary>
 /// 容器业务类
 /// </summary>
-public partial class BaseContainerService : Node, IController
+public partial class BaseContainerService : AbstractSystem
 {
 
-	public IArchitecture GetArchitecture()
+	protected override void OnInit()
 	{
-		return GameArchitecture.Interface;
+
 	}
 
 	/// <summary>
@@ -49,13 +49,13 @@ public partial class BaseContainerService : Node, IController
 	public ContainerData Regist(string containerName, int columns, int rows, bool isShop, Array<string> avilableTypes = null)
 	{
 		avilableTypes ??= new Array<string> { "ANY" };
-		if (isShop && !GBIS_CSharp.Instance.ShopNames.Contains(containerName))
+		if (isShop && !this.GetModel<GBIS_Model>().ShopNames.Contains(containerName))
 		{
-			GBIS_CSharp.Instance.ShopNames.Add(containerName);
+			this.GetModel<GBIS_Model>().ShopNames.Add(containerName);
 		}
-		else if (!isShop && !GBIS_CSharp.Instance.InventoryNames.Contains(containerName))
+		else if (!isShop && !this.GetModel<GBIS_Model>().InventoryNames.Contains(containerName))
 		{
-			GBIS_CSharp.Instance.InventoryNames.Add(containerName);
+			this.GetModel<GBIS_Model>().InventoryNames.Add(containerName);
 		}
 		return _containerRepository.AddContainer(containerName, columns, rows, avilableTypes);
 	}
@@ -99,10 +99,10 @@ public partial class BaseContainerService : Node, IController
 			var inv = _containerRepository.GetContainer(containerName);
 			if (inv != null)
 			{
-				var grids = inv.TryAddToGrid(itemData, gridId - GBIS_CSharp.Instance.MovingItemService.MovingItemOffset);
+				var grids = inv.TryAddToGrid(itemData, gridId - this.GetSystem<MovingItemService>().MovingItemOffset);
 				if (grids != null && grids.Count > 0)
 				{
-					GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemAdded, containerName, itemData, grids);
+					this.SendEvent(new SigInvItemAddedEvent() { grids = grids, itemData = itemData, invName = containerName });
 					return true;
 				}
 			}

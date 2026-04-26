@@ -8,11 +8,6 @@ namespace GridBaseInventorySystem;
 /// </summary>
 public partial class ContainerRepository : Resource
 {
-	/// <summary>
-	/// 保存时的前缀
-	/// </summary>
-	public const string Prefix = "container_";
-
 	private static ContainerRepository _instance;
 	/// <summary>
 	/// 单例
@@ -33,7 +28,7 @@ public partial class ContainerRepository : Resource
 	/// </summary>
 	public void SaveData()
 	{
-		ResourceSaver.Save(this, GBIS_CSharp.Instance.CurrentSavePath + Prefix + GBIS_CSharp.Instance.CurrentSaveName);
+		ResourceSaver.Save(this, GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 	}
 
 	/// <summary>
@@ -42,7 +37,7 @@ public partial class ContainerRepository : Resource
 	public void LoadData()
 	{
 		var savedRepository = GD.Load<ContainerRepository>(
-			GBIS_CSharp.Instance.CurrentSavePath + Prefix + GBIS_CSharp.Instance.CurrentSaveName);
+			GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 		if (savedRepository == null)
 			return;
 		foreach (var invName in savedRepository.ContainerDataMap.Keys)

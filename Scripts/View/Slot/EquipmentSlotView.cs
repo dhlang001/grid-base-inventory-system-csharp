@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -7,31 +8,18 @@ namespace GridBaseInventorySystem;
 /// 装备槽视图
 /// </summary>
 [Tool]
-public partial class EquipmentSlotView : Control
+public partial class EquipmentSlotView : Control, IController
 {
-	/// <summary>
-	/// 装备槽的绘制状态：正常、可用、不可用
-	/// </summary>
-	public enum SlotState
+
+	public IArchitecture GetArchitecture()
 	{
-		/// <summary>
-		/// 正常
-		/// </summary>
-		Normal,
-		/// <summary>
-		/// 可用
-		/// </summary>
-		Avilable,
-		/// <summary>
-		/// 不可用
-		/// </summary>
-		Invilable
+		return GameArchitecture.Interface;
 	}
 
 	/// <summary>
 	/// 装备槽名称，如果重复则展示同意来源的数据
 	/// </summary>
-	[Export] public string SlotName { get; set; } = GBIS_CSharp.DefaultSlotName;
+	[Export] public string SlotName { get; set; } = GBIS_Const.DefaultSlotName;
 
 	private int _baseSize = 32;
 	/// <summary>
@@ -129,7 +117,7 @@ public partial class EquipmentSlotView : Control
 	public void Refresh()
 	{
 		ClearSlot();
-		var slotData = GBIS_CSharp.Instance.EquipmentSlotService.GetSlot(SlotName);
+		var slotData = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName);
 		if (slotData != null)
 		{
 			var itemData = slotData.EquippedItem;
@@ -154,18 +142,18 @@ public partial class EquipmentSlotView : Control
 			return;
 		}
 
-		var ret = GBIS_CSharp.Instance.EquipmentSlotService.RegistSlot(SlotName, AvilableTypes);
+		var ret = this.GetSystem<EquipmentSlotService>().RegistSlot(SlotName, AvilableTypes);
 		if (ret == false)
 			return;
 
 		if (Visible)
-			GBIS_CSharp.Instance.OpenedEquipmentSlots.Add(SlotName);
+			this.GetModel<GBIS_Model>().OpenedEquipmentSlots.Add(SlotName);
 
 		MouseFilter = MouseFilterEnum.Pass;
 		InitItemContainer();
-		GBIS_CSharp.Instance.SigSlotItemEquipped += OnItemEquipped;
-		GBIS_CSharp.Instance.SigSlotItemUnequipped += OnItemUnequipped;
-		GBIS_CSharp.Instance.SigSlotRefresh += Refresh;
+		this.RegisterEvent<SigSlotItemEquippedEvent>(e => OnItemEquipped(e.slotName,e.itemData)).UnRegisterWhenNodeExitTree(this);
+		this.RegisterEvent<SigSlotItemUnequippedEvent>(e => OnItemUnequipped(e.slotName,e.itemData)).UnRegisterWhenNodeExitTree(this);
+		this.RegisterEvent<SigSlotRefreshEvent>(e => Refresh()).UnRegisterWhenNodeExitTree(this);
 		MouseEntered += OnSlotHover;
 		MouseExited += OnSlotLoseHover;
 
@@ -177,9 +165,9 @@ public partial class EquipmentSlotView : Control
 	private void OnVisibleChangedSlot()
 	{
 		if (IsVisibleInTree())
-			GBIS_CSharp.Instance.OpenedEquipmentSlots.Add(SlotName);
+			this.GetModel<GBIS_Model>().OpenedEquipmentSlots.Add(SlotName);
 		else
-			GBIS_CSharp.Instance.OpenedEquipmentSlots.Remove(SlotName);
+			this.GetModel<GBIS_Model>().OpenedEquipmentSlots.Remove(SlotName);
 	}
 
 	/// <summary>
@@ -187,17 +175,17 @@ public partial class EquipmentSlotView : Control
 	/// </summary>
 	private void OnSlotHover()
 	{
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+		if (this.GetSystem<MovingItemService>().MovingItem == null)
 		{
-			var itemData = GBIS_CSharp.Instance.EquipmentSlotService.GetSlot(SlotName)?.EquippedItem;
+			var itemData = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName)?.EquippedItem;
 			if (itemData != null)
-				GBIS_CSharp.Instance.ItemFocusService.FocusItem(itemData, SlotName);
+				this.GetSystem<ItemFocusService>().FocusItem(itemData, SlotName);
 			return;
 		}
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem is EquipmentData)
+		if (this.GetSystem<MovingItemService>().MovingItem is EquipmentData)
 		{
-			GBIS_CSharp.Instance.MovingItemService.MovingItemView.BaseSize = _baseSize;
-			bool isAvilable = GBIS_CSharp.Instance.EquipmentSlotService.GetSlot(SlotName).IsItemAvilable(GBIS_CSharp.Instance.MovingItemService.MovingItem);
+			this.GetSystem<MovingItemService>().MovingItemView.BaseSize = _baseSize;
+			bool isAvilable = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName).IsItemAvilable(this.GetSystem<MovingItemService>().MovingItem);
 			_currentState = (isAvilable && IsEmpty()) ? SlotState.Avilable : SlotState.Invilable;
 		}
 		else
@@ -213,7 +201,7 @@ public partial class EquipmentSlotView : Control
 	private void OnSlotLoseHover()
 	{
 		_currentState = SlotState.Normal;
-		GBIS_CSharp.Instance.ItemFocusService.ItemLoseFocus();
+		this.GetSystem<ItemFocusService>().ItemLoseFocus();
 		QueueRedraw();
 	}
 
@@ -320,23 +308,23 @@ public partial class EquipmentSlotView : Control
 		base._GuiInput(@event);
 
 		// 点击动作处理
-		if (@event.IsActionPressed(GBIS_CSharp.Instance.InputClick))
+		if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputClick))
 		{
-			GBIS_CSharp.Instance.ItemFocusService.ItemLoseFocus();
-			if (GBIS_CSharp.Instance.MovingItemService.MovingItem != null && IsEmpty())
+			this.GetSystem<ItemFocusService>().ItemLoseFocus();
+			if (this.GetSystem<MovingItemService>().MovingItem != null && IsEmpty())
 			{
-				GBIS_CSharp.Instance.EquipmentSlotService.EquipMovingItem(SlotName);
+				this.GetSystem<EquipmentSlotService>().EquipMovingItem(SlotName);
 			}
-			else if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null && !IsEmpty())
+			else if (this.GetSystem<MovingItemService>().MovingItem == null && !IsEmpty())
 			{
-				GBIS_CSharp.Instance.EquipmentSlotService.MoveItem(SlotName, _baseSize);
+				this.GetSystem<EquipmentSlotService>().MoveItem(SlotName, _baseSize);
 				OnSlotHover();
 			}
 		}
 		// 使用动作处理
-		else if (@event.IsActionPressed(GBIS_CSharp.Instance.InputUse) && !IsEmpty())
+		else if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputUse) && !IsEmpty())
 		{
-			GBIS_CSharp.Instance.EquipmentSlotService.Unequip(SlotName);
+			this.GetSystem<EquipmentSlotService>().Unequip(SlotName);
 		}
 	}
 }

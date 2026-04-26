@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dsog0gfwhvond"]
 
 [ext_resource type="Script" uid="uid://bkarglgkijmea" path="res://Scripts/Controller/SimpleInventoryController.cs" id="1_hx8vv"]
-[ext_resource type="Script" uid="uid://h0jscnkxg8nu" path="res://Scripts/Model/Item/ItemData.cs" id="2_sgum7"]
+[ext_resource type="Script" uid="uid://h0jscnkxg8nu" path="res://Scripts/ResourceObject/Item/ItemData.cs" id="2_sgum7"]
 [ext_resource type="Resource" uid="uid://cfaqbggan1oc1" path="res://Resources/consumable_1.tres" id="3_nkpi0"]
 [ext_resource type="Resource" uid="uid://ce4ddmxwi6jev" path="res://Resources/equipment_1.tres" id="4_d0q5i"]
 [ext_resource type="Resource" uid="uid://cq0t5tnyb46y7" path="res://Resources/stackable_1.tres" id="5_7li87"]

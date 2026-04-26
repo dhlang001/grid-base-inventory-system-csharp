@@ -1,7 +1,7 @@
 [gd_resource type="Resource" format=3 uid="uid://ce4ddmxwi6jev"]
 
 [ext_resource type="Texture2D" uid="uid://h387k1xiin2o" path="res://Art/UI/test_item_icons/boots.png" id="1_e08kd"]
-[ext_resource type="Script" uid="uid://dxoh401tbcqg0" path="res://Scripts/Model/Item/EquipmentData.cs" id="2_f5smg"]
+[ext_resource type="Script" uid="uid://dxoh401tbcqg0" path="res://Scripts/ResourceObject/Item/EquipmentData.cs" id="2_f5smg"]
 [ext_resource type="Material" uid="uid://du4t05r3sodcb" path="res://Art/Materials/equipment_glow.tres" id="2_gj1ny"]
 
 [resource]

@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -17,15 +18,15 @@ public partial class ShopView : BaseContainerView
 	/// <param name="gridId"></param>
 	public override void GridHover(Vector2I gridId)
 	{
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+		if (this.GetSystem<MovingItemService>().MovingItem == null)
 		{
-			var data = GBIS_CSharp.Instance.InventoryService.FindItemDataByGrid(ContainerName, gridId);
+			var data = this.GetSystem<InventoryService>().FindItemDataByGrid(ContainerName, gridId);
 			if (data != null)
-				GBIS_CSharp.Instance.ItemFocusService.FocusItem(data, ContainerName);
+				this.GetSystem<ItemFocusService>().FocusItem(data, ContainerName);
 			return;
 		}
 
-		var movingItemView = GBIS_CSharp.Instance.MovingItemService.MovingItemView;
+		var movingItemView = this.GetSystem<MovingItemService>().MovingItemView;
 		movingItemView.BaseSize = BaseSize;
 		movingItemView.StackNumColor = StackNumColor;
 		movingItemView.StackNumFont = StackNumFont;
@@ -39,7 +40,7 @@ public partial class ShopView : BaseContainerView
 	/// <param name="gridId"></param>
 	public override void GridLoseHover(Vector2I gridId)
 	{
-		GBIS_CSharp.Instance.ItemFocusService.ItemLoseFocus();
+		this.GetSystem<ItemFocusService>().ItemLoseFocus();
 	}
 
 	public override void _Ready()
@@ -56,22 +57,23 @@ public partial class ShopView : BaseContainerView
 			return;
 		}
 
-		var ret = GBIS_CSharp.Instance.ShopService.Regist(ContainerName, ContainerColumns, ContainerRows, true);
+		var ret = this.GetSystem<ShopService>().Regist(ContainerName, ContainerColumns, ContainerRows, true);
 
 		if (Visible)
-			GBIS_CSharp.Instance.OpenedContainers.Add(ContainerName);
+			this.GetModel<GBIS_Model>().OpenedContainers.Add(ContainerName);
 
 		ContainerColumns = ret.Columns;
 		ContainerRows = ret.Rows;
 
-		GBIS_CSharp.Instance.ShopService.GetContainer(ContainerName).Clear();
-		GBIS_CSharp.Instance.ShopService.LoadGoods(ContainerName, Goods);
+		this.GetSystem<ShopService>().GetContainer(ContainerName).Clear();
+		this.GetSystem<ShopService>().LoadGoods(ContainerName, Goods);
 
 		MouseFilter = MouseFilterEnum.Pass;
 		InitGridContainer();
 		InitItemContainer();
 		InitGrids();
-		GBIS_CSharp.Instance.SigInvRefresh += Refresh;
+
+		this.RegisterEvent<SigInvRefreshEvent>(e => Refresh()).UnRegisterWhenNodeExitTree(this);
 
 		VisibilityChanged += OnVisibleChanged;
 

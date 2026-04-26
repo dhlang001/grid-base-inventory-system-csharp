@@ -21,8 +21,8 @@ public partial class SimpleInventoryController : Control, IController
 	{
 		base._Ready();
 
-		GBIS_CSharp.Instance.AddQuickMoveRelation("demo1_inventory", "demo1_storage");
-		GBIS_CSharp.Instance.AddQuickMoveRelation("demo1_storage", "demo1_inventory");
+		this.GetSystem<GBIS_System>().AddQuickMoveRelation("demo1_inventory", "demo1_storage");
+		this.GetSystem<GBIS_System>().AddQuickMoveRelation("demo1_storage", "demo1_inventory");
 	}
 
 	public void _on_button_close_inventory_pressed()
@@ -49,20 +49,20 @@ public partial class SimpleInventoryController : Control, IController
 			{
 				var newItem = item.Duplicate();
 				((ItemData)newItem).ShaderParams = new Godot.Collections.Dictionary<string, Variant> { { "enable_enhance", true } };
-				GBIS_CSharp.Instance.AddItem("demo1_inventory", newItem as ItemData);
+				this.GetSystem<GBIS_System>().AddItem("demo1_inventory", newItem as ItemData);
 			}
 			else
 			{
-				GBIS_CSharp.Instance.AddItem("demo1_inventory", item);
+				this.GetSystem<GBIS_System>().AddItem("demo1_inventory", item);
 			}
 		}
 	}
 	public void _on_button_save_pressed()
 	{
-		GBIS_CSharp.Instance.SaveData();
+		this.GetSystem<GBIS_System>().SaveData();
 	}
 	public void _on_button_load_pressed()
 	{
-		GBIS_CSharp.Instance.LoadData();
+		this.GetSystem<GBIS_System>().LoadData();
 	}
 }

@@ -1,34 +1,13 @@
 using Godot;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
 /// <summary>
 /// 格子视图，用于绘制格子
 /// </summary>
-public partial class BaseGridView : Control
+public partial class BaseGridView : Control, IController
 {
-	/// <summary>
-	/// 格子的绘制状态：空、占用、冲突、可用
-	/// </summary>
-	public enum GridState
-	{
-		/// <summary>
-		/// 空
-		/// </summary>
-		Empty,
-		/// <summary>
-		/// 占用
-		/// </summary>
-		Taken,
-		/// <summary>
-		/// 冲突
-		/// </summary>
-		Conflict,
-		/// <summary>
-		/// 可用
-		/// </summary>
-		Avilable
-	}
 
 	/// <summary>
 	/// 默认边框颜色
@@ -122,6 +101,11 @@ public partial class BaseGridView : Control
 		_takenColor = takenColor;
 		_conflictColor = conflictColor;
 		CustomMinimumSize = new Vector2(_size, _size);
+	}
+
+	public IArchitecture GetArchitecture()
+	{
+		return GameArchitecture.Interface;
 	}
 
 	/// <summary>

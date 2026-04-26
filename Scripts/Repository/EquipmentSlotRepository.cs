@@ -8,10 +8,6 @@ namespace GridBaseInventorySystem;
 /// </summary>
 public partial class EquipmentSlotRepository : Resource
 {
-	/// <summary>
-	/// 保存时的前缀
-	/// </summary>
-	public const string Prefix = "equipment_slot_";
 
 	private static EquipmentSlotRepository _instance;
 	/// <summary>
@@ -29,7 +25,7 @@ public partial class EquipmentSlotRepository : Resource
 	/// </summary>
 	public void SaveData()
 	{
-		ResourceSaver.Save(this, GBIS_CSharp.Instance.CurrentSavePath + Prefix + GBIS_CSharp.Instance.CurrentSaveName);
+		ResourceSaver.Save(this, GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 	}
 
 	/// <summary>
@@ -46,7 +42,7 @@ public partial class EquipmentSlotRepository : Resource
 			}
 		}
 
-		var savedRepository = GD.Load<EquipmentSlotRepository>(GBIS_CSharp.Instance.CurrentSavePath + Prefix + GBIS_CSharp.Instance.CurrentSaveName);
+		var savedRepository = GD.Load<EquipmentSlotRepository>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 		if (savedRepository == null) return;
 		foreach (var slotName in savedRepository.SlotDataMap.Keys)
 		{
@@ -97,7 +93,7 @@ public partial class EquipmentSlotRepository : Resource
 	{
 		foreach (var slot in SlotDataMap.Values)
 		{
-			if (GBIS_CSharp.Instance.OpenedEquipmentSlots.Contains(slot.SlotName) && slot.Equip(itemData))
+			if (GameArchitecture.Interface.GetModel<GBIS_Model>().OpenedEquipmentSlots.Contains(slot.SlotName) && slot.Equip(itemData))
 			{
 				return slot;
 			}

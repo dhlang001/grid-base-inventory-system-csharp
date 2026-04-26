@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://cq0t5tnyb46y7"]
 
-[ext_resource type="Script" uid="uid://crgptmh30c05g" path="res://Scripts/Model/Item/StackableData.cs" id="1_hjpmk"]
+[ext_resource type="Script" uid="uid://crgptmh30c05g" path="res://Scripts/ResourceObject/Item/StackableData.cs" id="1_hjpmk"]
 [ext_resource type="Texture2D" uid="uid://dee83vexb4iqj" path="res://Art/UI/test_item_icons/jewel.png" id="1_jjoo7"]
 
 [resource]

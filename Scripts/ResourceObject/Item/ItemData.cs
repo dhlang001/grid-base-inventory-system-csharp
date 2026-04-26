@@ -112,9 +112,9 @@ public partial class ItemData : Resource
 	{
 		if (!CanBuy())
 			return false;
-		foreach (var targetInv in GBIS_CSharp.Instance.InventoryNames)
+		foreach (var targetInv in GameArchitecture.Interface.GetModel<GBIS_Model>().InventoryNames)
 		{
-			if (GBIS_CSharp.Instance.InventoryService.AddItem(targetInv, this))
+			if (GameArchitecture.Interface.GetSystem<InventoryService>().AddItem(targetInv, this))
 			{
 				Cost();
 				return true;

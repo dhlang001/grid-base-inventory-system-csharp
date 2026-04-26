@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using QFramework;
 
 namespace GridBaseInventorySystem;
 
@@ -34,7 +35,7 @@ public partial class InventoryService : BaseContainerService
 					stackableNew.CurrentAmount = stackable.AddAmount(stackableNew.CurrentAmount);
 					var newItemGrids = _containerRepository.GetContainer(invName).FindGridsByItemData(item);
 					System.Diagnostics.Debug.Assert(newItemGrids.Count > 0);
-					GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemUpdated, invName, newItemGrids[0]);
+					this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = newItemGrids[0] });
 					if (stackableNew.CurrentAmount <= 0)
 						return true;
 				}
@@ -44,7 +45,7 @@ public partial class InventoryService : BaseContainerService
 		var grids = _containerRepository.GetContainer(invName).AddItem(newItemData);
 		if (grids != null && grids.Count > 0)
 		{
-			GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemAdded, invName, newItemData, grids);
+			this.SendEvent(new SigInvItemAddedEvent() { invName = invName, itemData = newItemData, grids = grids });
 			return true;
 		}
 		return false;
@@ -57,24 +58,24 @@ public partial class InventoryService : BaseContainerService
 	/// <param name="gridId"></param>
 	public void StackMovingItem(string invName, Vector2I gridId)
 	{
-		if (GBIS_CSharp.Instance.MovingItemService.MovingItem == null)
+		if (this.GetSystem<MovingItemService>().MovingItem == null)
 			return;
 		var itemData = FindItemDataByGrid(invName, gridId);
 		if (itemData is not StackableData)
 			return;
-		if (itemData.ItemName == GBIS_CSharp.Instance.MovingItemService.MovingItem.ItemName)
+		if (itemData.ItemName == this.GetSystem<MovingItemService>().MovingItem.ItemName)
 		{
 			var amountLeft = ((StackableData)itemData).AddAmount(
-				((StackableData)GBIS_CSharp.Instance.MovingItemService.MovingItem).CurrentAmount);
+				((StackableData)this.GetSystem<MovingItemService>().MovingItem).CurrentAmount);
 			if (amountLeft > 0)
 			{
-				((StackableData)GBIS_CSharp.Instance.MovingItemService.MovingItem).CurrentAmount = amountLeft;
+				((StackableData)this.GetSystem<MovingItemService>().MovingItem).CurrentAmount = amountLeft;
 			}
 			else
 			{
-				GBIS_CSharp.Instance.MovingItemService.ClearMovingItem();
+				this.GetSystem<MovingItemService>().ClearMovingItem();
 			}
-			GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemUpdated, invName, gridId);
+			this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = gridId });
 		}
 	}
 
@@ -86,9 +87,9 @@ public partial class InventoryService : BaseContainerService
 	/// <returns></returns>
 	public bool PlaceMovingItem(string invName, Vector2I gridId)
 	{
-		if (PlaceTo(invName, GBIS_CSharp.Instance.MovingItemService.MovingItem, gridId))
+		if (PlaceTo(invName, this.GetSystem<MovingItemService>().MovingItem, gridId))
 		{
-			GBIS_CSharp.Instance.MovingItemService.ClearMovingItem();
+			this.GetSystem<MovingItemService>().ClearMovingItem();
 			return true;
 		}
 		return false;
@@ -107,7 +108,7 @@ public partial class InventoryService : BaseContainerService
 			return false;
 		if (itemData is EquipmentData)
 		{
-			if (GBIS_CSharp.Instance.EquipmentSlotService.TryEquip(itemData))
+			if (this.GetSystem<EquipmentSlotService>().TryEquip(itemData))
 			{
 				RemoveItemByData(invName, itemData);
 				return true;
@@ -121,7 +122,7 @@ public partial class InventoryService : BaseContainerService
 			}
 			else
 			{
-				GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemUpdated, invName, gridId);
+				this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = gridId });
 			}
 			return true;
 		}
@@ -148,11 +149,11 @@ public partial class InventoryService : BaseContainerService
 				int newAmount1 = originAmount / 2;
 				int newAmount2 = originAmount - newAmount1;
 				stackable.CurrentAmount = newAmount1;
-				GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemUpdated, invName, gridId);
+				this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = gridId });
 
 				var newItem = (StackableData)item.Duplicate();
 				newItem.CurrentAmount = newAmount2;
-				GBIS_CSharp.Instance.MovingItemService.MoveItemByData(newItem, offset, baseSize);
+				this.GetSystem<MovingItemService>().MoveItemByData(newItem, offset, baseSize);
 				return newItem;
 			}
 		}
@@ -172,7 +173,7 @@ public partial class InventoryService : BaseContainerService
 			return;
 		foreach (var targetContainer in targetInventories)
 		{
-			if (!GBIS_CSharp.Instance.OpenedContainers.Contains(targetContainer))
+			if (!this.GetModel<GBIS_Model>().OpenedContainers.Contains(targetContainer))
 				continue;
 			if (AddItem(targetContainer, itemToMove))
 			{
@@ -181,7 +182,7 @@ public partial class InventoryService : BaseContainerService
 			}
 			else if (itemToMove is StackableData)
 			{
-				GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemUpdated, invName, gridId);
+				this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = gridId });
 			}
 		}
 	}
@@ -215,7 +216,7 @@ public partial class InventoryService : BaseContainerService
 	{
 		if (_containerRepository.GetContainer(invName).RemoveItem(itemData))
 		{
-			GBIS_CSharp.Instance.EmitSignal(GBIS_CSharp.SignalName.SigInvItemRemoved, invName, itemData);
+			this.SendEvent(new SigInvItemRemovedEvent() { invName = invName, itemData = itemData });
 		}
 	}
 
@@ -226,7 +227,7 @@ public partial class InventoryService : BaseContainerService
 	/// <returns></returns>
 	public ContainerData GetContainer(string containerName)
 	{
-		if (GBIS_CSharp.Instance.InventoryNames.Contains(containerName))
+		if (this.GetModel<GBIS_Model>().InventoryNames.Contains(containerName))
 			return _containerRepository.GetContainer(containerName);
 		return null;
 	}
