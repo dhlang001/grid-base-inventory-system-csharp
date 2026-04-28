@@ -11,6 +11,7 @@ public partial class ItemData : Resource
 	/// <summary>
 	/// 调用后，将调用包含这个 data 的 view 的 QueueRedraw()。
 	/// 场景：比如，强化装备后，修改了 shader 参数，但是不想重绘整个 Inventory，可以 emit 这个信号
+	/// 注：ItemView需要更新的话，用此信号，以防止出现“广播风暴”式的低效。
 	/// </summary>
 	[Signal] public delegate void SigRefreshEventHandler();
 

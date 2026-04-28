@@ -18,7 +18,7 @@ public partial class GBIS_System : AbstractSystem
 	public void SaveData()
 	{
 		this.GetSystem<InventoryService>().SaveData();
-		this.GetSystem<EquipmentSlotService>().SaveData();
+		this.GetSystem<EquipmentSystem>().SaveData();
 	}
 
 	/// <summary>
@@ -28,7 +28,7 @@ public partial class GBIS_System : AbstractSystem
 	{
 		await this.GetModel<GBIS_Model>().GBIS_BaseNode.ToSignal(this.GetModel<GBIS_Model>().GBIS_BaseNode.GetTree(), SceneTree.SignalName.ProcessFrame);
 		this.GetSystem<InventoryService>().LoadData();
-		this.GetSystem<EquipmentSlotService>().LoadData();
+		this.GetSystem<EquipmentSystem>().LoadData();
 		this.SendEvent<SigInvRefreshEvent>();
 		this.SendEvent<SigSlotRefreshEvent>();
 		this.SendEvent<SigShopRefreshEvent>();

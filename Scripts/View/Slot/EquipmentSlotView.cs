@@ -117,7 +117,7 @@ public partial class EquipmentSlotView : Control, IController
 	public void Refresh()
 	{
 		ClearSlot();
-		var slotData = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName);
+		var slotData = this.GetSystem<EquipmentSystem>().GetSlot(SlotName);
 		if (slotData != null)
 		{
 			var itemData = slotData.EquippedItem;
@@ -142,7 +142,7 @@ public partial class EquipmentSlotView : Control, IController
 			return;
 		}
 
-		var ret = this.GetSystem<EquipmentSlotService>().RegistSlot(SlotName, AvilableTypes);
+		var ret = this.GetSystem<EquipmentSystem>().RegistSlot(SlotName, AvilableTypes);
 		if (ret == false)
 			return;
 
@@ -177,7 +177,7 @@ public partial class EquipmentSlotView : Control, IController
 	{
 		if (this.GetSystem<MovingItemService>().MovingItem == null)
 		{
-			var itemData = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName)?.EquippedItem;
+			var itemData = this.GetSystem<EquipmentSystem>().GetSlot(SlotName)?.EquippedItem;
 			if (itemData != null)
 				this.GetSystem<ItemFocusService>().FocusItem(itemData, SlotName);
 			return;
@@ -185,7 +185,7 @@ public partial class EquipmentSlotView : Control, IController
 		if (this.GetSystem<MovingItemService>().MovingItem is EquipmentData)
 		{
 			this.GetSystem<MovingItemService>().MovingItemView.BaseSize = _baseSize;
-			bool isAvilable = this.GetSystem<EquipmentSlotService>().GetSlot(SlotName).IsItemAvilable(this.GetSystem<MovingItemService>().MovingItem);
+			bool isAvilable = this.GetSystem<EquipmentSystem>().GetSlot(SlotName).IsItemAvilable(this.GetSystem<MovingItemService>().MovingItem);
 			_currentState = (isAvilable && IsEmpty()) ? SlotState.Avilable : SlotState.Invilable;
 		}
 		else
@@ -313,18 +313,18 @@ public partial class EquipmentSlotView : Control, IController
 			this.GetSystem<ItemFocusService>().ItemLoseFocus();
 			if (this.GetSystem<MovingItemService>().MovingItem != null && IsEmpty())
 			{
-				this.GetSystem<EquipmentSlotService>().EquipMovingItem(SlotName);
+				this.GetSystem<EquipmentSystem>().EquipMovingItem(SlotName);
 			}
 			else if (this.GetSystem<MovingItemService>().MovingItem == null && !IsEmpty())
 			{
-				this.GetSystem<EquipmentSlotService>().MoveItem(SlotName, _baseSize);
+				this.GetSystem<EquipmentSystem>().MoveItem(SlotName, _baseSize);
 				OnSlotHover();
 			}
 		}
 		// 使用动作处理
 		else if (@event.IsActionPressed(this.GetModel<GBIS_Model>().InputUse) && !IsEmpty())
 		{
-			this.GetSystem<EquipmentSlotService>().Unequip(SlotName);
+			this.GetSystem<EquipmentSystem>().Unequip(SlotName);
 		}
 	}
 }

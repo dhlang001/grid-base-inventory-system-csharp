@@ -10,4 +10,3 @@ CurrentAmount = 5
 ItemName = "Bless Jewel"
 Type = "JEWEL"
 Icon = ExtResource("1_jjoo7")
-metadata/_custom_type_script = "uid://bm5efdrlci0qk"

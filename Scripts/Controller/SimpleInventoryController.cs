@@ -65,4 +65,8 @@ public partial class SimpleInventoryController : Control, IController
 	{
 		this.GetSystem<GBIS_System>().LoadData();
 	}
+	public void _on_button_refresh_pressed()
+	{
+		GameArchitecture.Interface.SendEvent<SigInvRefreshEvent>();
+	}
 }

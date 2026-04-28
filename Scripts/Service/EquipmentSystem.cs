@@ -7,12 +7,8 @@ namespace GridBaseInventorySystem;
 /// <summary>
 /// 装备槽业务类
 /// </summary>
-public partial class EquipmentSlotService : AbstractSystem
+public partial class EquipmentSystem : AbstractSystem
 {
-	/// <summary>
-	/// 装备槽数据库引用
-	/// </summary>
-	protected EquipmentSlotRepository _equipmentSlotRepository = EquipmentSlotRepository.Instance;
 
 	protected override void OnInit()
 	{
@@ -21,18 +17,36 @@ public partial class EquipmentSlotService : AbstractSystem
 
 	/// <summary>
 	/// 保存所有装备槽数据
+	/// 注：可能需要重构到存档系统统一管理
 	/// </summary>
 	public void SaveData()
 	{
-		_equipmentSlotRepository.SaveData();
+		if (this.GetModel<EquipmentModel>().EquipmentResourceObject == null)
+		{
+			this.GetModel<EquipmentModel>().EquipmentResourceObject = new EquipmentResourceObject();
+		}
+		this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap = this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap;
+		ResourceSaver.Save(this.GetModel<EquipmentModel>().EquipmentResourceObject, GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 	}
 
 	/// <summary>
-	/// 读取所有装备槽数据
+	/// 读取所有装备槽，会重新穿戴所有装备
+	/// 注：可能需要重构到存档系统统一管理
 	/// </summary>
 	public void LoadData()
 	{
-		_equipmentSlotRepository.LoadData();
+		foreach (var slotName in this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap.Keys)
+		{
+			var itemData = this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap[slotName].EquippedItem as EquipmentData;
+			if (itemData != null)
+			{
+				itemData.Unequipped(slotName);
+			}
+		}
+
+		var saveRepository = GD.Load<EquipmentResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
+		if (saveRepository == null) return;
+		this.GetModel<EquipmentModel>().EquipmentResourceObject = saveRepository.DuplicateDeep() as EquipmentResourceObject;
 	}
 
 	/// <summary>
@@ -42,7 +56,7 @@ public partial class EquipmentSlotService : AbstractSystem
 	/// <returns></returns>
 	public EquipmentSlotData GetSlot(string slotName)
 	{
-		return _equipmentSlotRepository.GetSlot(slotName);
+		return this.GetModel<EquipmentModel>().GetSlot(slotName);
 	}
 
 	/// <summary>
@@ -54,7 +68,7 @@ public partial class EquipmentSlotService : AbstractSystem
 	/// <returns></returns>
 	public bool RegistSlot(string slotName, Array<string> avilableTypes)
 	{
-		var slotData = _equipmentSlotRepository.GetSlot(slotName);
+		var slotData = this.GetModel<EquipmentModel>().GetSlot(slotName);
 		if (slotData != null)
 		{
 			bool isSameAvilableTypes = avilableTypes.Count == slotData.AvilableTypes.Count;
@@ -71,7 +85,7 @@ public partial class EquipmentSlotService : AbstractSystem
 		}
 		else
 		{
-			return _equipmentSlotRepository.AddSlot(slotName, avilableTypes);
+			return this.GetModel<EquipmentModel>().AddSlot(slotName, avilableTypes);
 		}
 	}
 
@@ -84,7 +98,7 @@ public partial class EquipmentSlotService : AbstractSystem
 	{
 		if (itemData == null)
 			return false;
-		var slot = _equipmentSlotRepository.TryEquip(itemData);
+		var slot = this.GetModel<EquipmentModel>().TryEquip(itemData);
 		if (slot != null)
 		{
 			this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slot.SlotName, itemData = itemData });
@@ -116,7 +130,7 @@ public partial class EquipmentSlotService : AbstractSystem
 	/// <returns></returns>
 	public bool EquipTo(string slotName, ItemData itemData)
 	{
-		if (_equipmentSlotRepository.GetSlot(slotName).Equip(itemData))
+		if (this.GetModel<EquipmentModel>().GetSlot(slotName).Equip(itemData))
 		{
 			this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
 			return true;
@@ -141,7 +155,7 @@ public partial class EquipmentSlotService : AbstractSystem
 			var itemData = GetSlot(slotName).EquippedItem;
 			if (itemData != null && this.GetSystem<InventoryService>().AddItem(currentInventory, itemData))
 			{
-				_equipmentSlotRepository.GetSlot(slotName).Unequip();
+				this.GetModel<EquipmentModel>().GetSlot(slotName).Unequip();
 				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
 				return itemData;
 			}
@@ -164,7 +178,7 @@ public partial class EquipmentSlotService : AbstractSystem
 		var itemData = GetSlot(slotName).EquippedItem;
 		if (itemData != null)
 		{
-			if (_equipmentSlotRepository.GetSlot(slotName).Unequip() != null)
+			if (this.GetModel<EquipmentModel>().GetSlot(slotName).Unequip() != null)
 			{
 				this.GetSystem<MovingItemService>().MoveItemByData(itemData, Vector2I.Zero, baseSize);
 				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });

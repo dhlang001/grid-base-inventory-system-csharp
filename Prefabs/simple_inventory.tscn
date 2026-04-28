@@ -190,6 +190,10 @@ text = "Save Game"
 layout_mode = 2
 text = "Load Game"
 
+[node name="ButtonRefresh" type="Button" parent="VBoxContainer" unique_id=625236878]
+layout_mode = 2
+text = "Refresh"
+
 [node name="Label" type="Label" parent="." unique_id=991261436]
 layout_mode = 0
 offset_left = 92.0
@@ -219,3 +223,4 @@ layout_mode = 0
 [connection signal="pressed" from="VBoxContainer/ButtonAddTestItems" to="." method="_on_button_add_test_items_pressed"]
 [connection signal="pressed" from="VBoxContainer/ButtonSave" to="." method="_on_button_save_pressed"]
 [connection signal="pressed" from="VBoxContainer/ButtonLoad" to="." method="_on_button_load_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonRefresh" to="." method="_on_button_refresh_pressed"]

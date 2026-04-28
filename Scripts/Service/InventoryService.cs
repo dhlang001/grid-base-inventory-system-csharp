@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using QFramework;
+using System;
 
 namespace GridBaseInventorySystem;
 
@@ -33,8 +34,9 @@ public partial class InventoryService : BaseContainerService
 				if (item is StackableData stackable && !stackable.IsFull())
 				{
 					stackableNew.CurrentAmount = stackable.AddAmount(stackableNew.CurrentAmount);
-					var newItemGrids = _containerRepository.GetContainer(invName).FindGridsByItemData(item);
+					var newItemGrids = this.GetModel<ContainerModel>().GetContainer(invName).FindGridsByItemData(item);
 					System.Diagnostics.Debug.Assert(newItemGrids.Count > 0);
+					// if (newItemGrids.Count > 0) throw new Exception("newItemGrids.Count > 0");
 					this.SendEvent(new SigInvItemUpdatedEvent() { invName = invName, gridId = newItemGrids[0] });
 					if (stackableNew.CurrentAmount <= 0)
 						return true;
@@ -42,7 +44,7 @@ public partial class InventoryService : BaseContainerService
 			}
 		}
 		// 增加不可堆叠物品，或堆叠后剩余的物品
-		var grids = _containerRepository.GetContainer(invName).AddItem(newItemData);
+		var grids = this.GetModel<ContainerModel>().GetContainer(invName).AddItem(newItemData);
 		if (grids != null && grids.Count > 0)
 		{
 			this.SendEvent(new SigInvItemAddedEvent() { invName = invName, itemData = newItemData, grids = grids });
@@ -108,7 +110,7 @@ public partial class InventoryService : BaseContainerService
 			return false;
 		if (itemData is EquipmentData)
 		{
-			if (this.GetSystem<EquipmentSlotService>().TryEquip(itemData))
+			if (this.GetSystem<EquipmentSystem>().TryEquip(itemData))
 			{
 				RemoveItemByData(invName, itemData);
 				return true;
@@ -139,7 +141,7 @@ public partial class InventoryService : BaseContainerService
 	/// <returns></returns>
 	public ItemData SplitItem(string invName, Vector2I gridId, Vector2I offset, int baseSize)
 	{
-		var inv = _containerRepository.GetContainer(invName);
+		var inv = this.GetModel<ContainerModel>().GetContainer(invName);
 		if (inv != null)
 		{
 			var item = inv.FindItemDataByGrid(gridId);
@@ -167,8 +169,8 @@ public partial class InventoryService : BaseContainerService
 	/// <param name="gridId"></param>
 	public void QuickMove(string invName, Vector2I gridId)
 	{
-		var targetInventories = _containerRepository.GetQuickMoveRelations(invName);
-		var itemToMove = _containerRepository.GetContainer(invName).FindItemDataByGrid(gridId);
+		var targetInventories = this.GetModel<ContainerModel>().GetQuickMoveRelations(invName);
+		var itemToMove = this.GetModel<ContainerModel>().GetContainer(invName).FindItemDataByGrid(gridId);
 		if (targetInventories.Count == 0 || itemToMove == null)
 			return;
 		foreach (var targetContainer in targetInventories)
@@ -194,7 +196,7 @@ public partial class InventoryService : BaseContainerService
 	/// <param name="targetInvName"></param>
 	public void AddQuickMoveRelation(string invName, string targetInvName)
 	{
-		_containerRepository.AddQuickMoveRelation(invName, targetInvName);
+		this.GetModel<ContainerModel>().AddQuickMoveRelation(invName, targetInvName);
 	}
 
 	/// <summary>
@@ -204,7 +206,7 @@ public partial class InventoryService : BaseContainerService
 	/// <param name="targetInvName"></param>
 	public void RemoveQuickMoveRelation(string invName, string targetInvName)
 	{
-		_containerRepository.RemoveQuickMoveRelation(invName, targetInvName);
+		this.GetModel<ContainerModel>().RemoveQuickMoveRelation(invName, targetInvName);
 	}
 
 	/// <summary>
@@ -214,7 +216,7 @@ public partial class InventoryService : BaseContainerService
 	/// <param name="itemData"></param>
 	public void RemoveItemByData(string invName, ItemData itemData)
 	{
-		if (_containerRepository.GetContainer(invName).RemoveItem(itemData))
+		if (this.GetModel<ContainerModel>().GetContainer(invName).RemoveItem(itemData))
 		{
 			this.SendEvent(new SigInvItemRemovedEvent() { invName = invName, itemData = itemData });
 		}
@@ -228,7 +230,7 @@ public partial class InventoryService : BaseContainerService
 	public ContainerData GetContainer(string containerName)
 	{
 		if (this.GetModel<GBIS_Model>().InventoryNames.Contains(containerName))
-			return _containerRepository.GetContainer(containerName);
+			return this.GetModel<ContainerModel>().GetContainer(containerName);
 		return null;
 	}
 }

@@ -15,7 +15,7 @@ public partial class ShopService : BaseContainerService
 	{
 		foreach (var good in goods)
 		{
-			_containerRepository.GetContainer(shopName).AddItem((ItemData)good.Duplicate());
+			this.GetModel<ContainerModel>().GetContainer(shopName).AddItem((ItemData)good.Duplicate());
 		}
 	}
 
@@ -54,7 +54,7 @@ public partial class ShopService : BaseContainerService
 	public ContainerData GetContainer(string containerName)
 	{
 		if (this.GetModel<GBIS_Model>().ShopNames.Contains(containerName))
-			return _containerRepository.GetContainer(containerName);
+			return this.GetModel<ContainerModel>().GetContainer(containerName);
 		return null;
 	}
 }

@@ -17,24 +17,28 @@ public partial class BaseContainerService : AbstractSystem
 	}
 
 	/// <summary>
-	/// 容器数据库引用
-	/// </summary>
-	protected ContainerRepository _containerRepository = ContainerRepository.Instance;
-
-	/// <summary>
-	/// 保存所有容器
+	/// 保存所有背包数据
+	/// 注：可能需要重构到存档系统统一管理
 	/// </summary>
 	public void SaveData()
 	{
-		_containerRepository.SaveData();
+		if (this.GetModel<ContainerModel>().ContainerResourceObject == null)
+		{
+			this.GetModel<ContainerModel>().ContainerResourceObject = new ContainerResourceObject();
+		}
+		ResourceSaver.Save(this.GetModel<ContainerModel>().ContainerResourceObject, GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 	}
 
 	/// <summary>
-	/// 读取所有容器
+	/// 读取所有容器数据
+	/// 注：可能需要重构到存档系统统一管理
 	/// </summary>
 	public void LoadData()
 	{
-		_containerRepository.LoadData();
+		var saveRepository = GD.Load<ContainerResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
+		if (saveRepository == null)
+			return;
+		this.GetModel<ContainerModel>().ContainerResourceObject = saveRepository.DuplicateDeep() as ContainerResourceObject;
 	}
 
 	/// <summary>
@@ -57,7 +61,7 @@ public partial class BaseContainerService : AbstractSystem
 		{
 			this.GetModel<GBIS_Model>().InventoryNames.Add(containerName);
 		}
-		return _containerRepository.AddContainer(containerName, columns, rows, avilableTypes);
+		return this.GetModel<ContainerModel>().AddContainer(containerName, columns, rows, avilableTypes);
 	}
 
 	/// <summary>
@@ -68,7 +72,7 @@ public partial class BaseContainerService : AbstractSystem
 	/// <returns></returns>
 	public Array<ItemData> FindItemDataByItemName(string containerName, string itemName)
 	{
-		var inv = _containerRepository.GetContainer(containerName);
+		var inv = this.GetModel<ContainerModel>().GetContainer(containerName);
 		if (inv != null)
 			return inv.FindItemDataByItemName(itemName);
 		return new Array<ItemData>();
@@ -82,7 +86,7 @@ public partial class BaseContainerService : AbstractSystem
 	/// <returns></returns>
 	public ItemData FindItemDataByGrid(string containerName, Vector2I gridId)
 	{
-		return _containerRepository.GetContainer(containerName).FindItemDataByGrid(gridId);
+		return this.GetModel<ContainerModel>().GetContainer(containerName).FindItemDataByGrid(gridId);
 	}
 
 	/// <summary>
@@ -96,7 +100,7 @@ public partial class BaseContainerService : AbstractSystem
 	{
 		if (itemData != null)
 		{
-			var inv = _containerRepository.GetContainer(containerName);
+			var inv = this.GetModel<ContainerModel>().GetContainer(containerName);
 			if (inv != null)
 			{
 				var grids = inv.TryAddToGrid(itemData, gridId - this.GetSystem<MovingItemService>().MovingItemOffset);

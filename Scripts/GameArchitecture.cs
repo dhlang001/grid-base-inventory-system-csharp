@@ -13,7 +13,7 @@ public class GameArchitecture : Architecture<GameArchitecture>
 		this.RegisterSystem<GBIS_System>(new GBIS_System());
 		this.RegisterSystem<InventoryService>(new InventoryService());
 		this.RegisterSystem<ShopService>(new ShopService());
-		this.RegisterSystem<EquipmentSlotService>(new EquipmentSlotService());
+		this.RegisterSystem<EquipmentSystem>(new EquipmentSystem());
 		this.RegisterSystem<MovingItemService>(new MovingItemService());
 		this.RegisterSystem<ItemFocusService>(new ItemFocusService());
 
@@ -22,6 +22,8 @@ public class GameArchitecture : Architecture<GameArchitecture>
 		#region 注册 Model
 
 		this.RegisterModel<GBIS_Model>(new GBIS_Model());
+		this.RegisterModel<ContainerModel>(new ContainerModel());
+		this.RegisterModel<EquipmentModel>(new EquipmentModel());
 
 		#endregion
 
