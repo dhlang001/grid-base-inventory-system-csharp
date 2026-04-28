@@ -35,7 +35,7 @@ public partial class BaseContainerService : AbstractSystem
 	/// </summary>
 	public void LoadData()
 	{
-		var saveRepository = GD.Load<ContainerResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
+		var saveRepository = ResourceLoader.Load<ContainerResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_ContainerData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName, default, ResourceLoader.CacheMode.Ignore);
 		if (saveRepository == null)
 			return;
 		this.GetModel<ContainerModel>().ContainerResourceObject = saveRepository.DuplicateDeep() as ContainerResourceObject;

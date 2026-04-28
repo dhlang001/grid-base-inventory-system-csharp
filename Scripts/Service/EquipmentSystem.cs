@@ -25,7 +25,6 @@ public partial class EquipmentSystem : AbstractSystem
 		{
 			this.GetModel<EquipmentModel>().EquipmentResourceObject = new EquipmentResourceObject();
 		}
-		this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap = this.GetModel<EquipmentModel>().EquipmentResourceObject.SlotDataMap;
 		ResourceSaver.Save(this.GetModel<EquipmentModel>().EquipmentResourceObject, GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
 	}
 
@@ -44,7 +43,7 @@ public partial class EquipmentSystem : AbstractSystem
 			}
 		}
 
-		var saveRepository = GD.Load<EquipmentResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName);
+		var saveRepository = ResourceLoader.Load<EquipmentResourceObject>(GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSavePath + GBIS_Const.Prefix_EquipmentSlotData + GameArchitecture.Interface.GetModel<GBIS_Model>().CurrentSaveName, default, ResourceLoader.CacheMode.Ignore);
 		if (saveRepository == null) return;
 		this.GetModel<EquipmentModel>().EquipmentResourceObject = saveRepository.DuplicateDeep() as EquipmentResourceObject;
 	}
