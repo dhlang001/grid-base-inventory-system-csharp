@@ -155,7 +155,7 @@ public partial class EquipmentSystem : AbstractSystem
 			if (itemData != null && this.GetSystem<InventoryService>().AddItem(currentInventory, itemData))
 			{
 				this.GetModel<EquipmentModel>().GetSlot(slotName).Unequip();
-				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
+				this.SendEvent<SigSlotItemUnequippedEvent>(new SigSlotItemUnequippedEvent() { slotName = slotName, itemData = itemData });
 				return itemData;
 			}
 		}
@@ -180,7 +180,7 @@ public partial class EquipmentSystem : AbstractSystem
 			if (this.GetModel<EquipmentModel>().GetSlot(slotName).Unequip() != null)
 			{
 				this.GetSystem<MovingItemService>().MoveItemByData(itemData, Vector2I.Zero, baseSize);
-				this.SendEvent<SigSlotItemEquippedEvent>(new SigSlotItemEquippedEvent() { slotName = slotName, itemData = itemData });
+				this.SendEvent<SigSlotItemUnequippedEvent>(new SigSlotItemUnequippedEvent() { slotName = slotName, itemData = itemData });
 			}
 		}
 	}
